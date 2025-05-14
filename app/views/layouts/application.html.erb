@@ -1,16 +1,39 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Protospace42318</title>
+    <title>Protospace</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <link rel="stylesheet" type="style.css" href="">
+
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP:400,700,900&display=swap" rel="stylesheet">
   </head>
-
-  <body>
+    <body>
+    <header>
+     <div class="header">
+       <div class="inner nav">
+         <div class="logo">
+          <%= image_tag 'logo.png', alt: 'ProtoSpace Logo' %>
+        </div>
+        <% if user_signed_in? %>
+          <div class="user_nav grid-6">
+            <%= link_to "ログアウト", destroy_user_session_path, data: { turbo_method: :delete } %>
+            <%= link_to "New Proto", new_prototype_path, class: "nav__btn" %>
+         </div>
+        <% else %>
+          <div class="grid-6">
+             <%= link_to 'ログイン',new_user_session_path, class: 'nav__btn' %>
+             <%= link_to '新規登録',new_user_registration_path, class: 'nav__btn' %>
+          </div>
+        <% end %>
+       </div>
+      </div>
+   </header>
     <%= yield %>
+    <footer class="footer">
+      <p class="copyright">Copyright PROTO SPACE All rights reserved</p>
+    </footer>
   </body>
 </html>

@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
-  get 'login', to: 'sessions#new' # ログインページ
-  get 'sighup', to: 'users#new'  # 新規登録ページ
+  devise_for :users
   root 'prototypes#index'        # その他のルート
+  resources :users, only: [:show,:index]
+  resources :prototypes
 end
