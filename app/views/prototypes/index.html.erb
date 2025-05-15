@@ -1,14 +1,8 @@
 
   <main>
     <%= "こんにちは、#{current_user.name}さん" %>
-    <div class="main__description">
-      <p></p>
-      <div class="card__wrapper">
-        <%# 投稿機能実装後、部分テンプレートでプロトタイプ投稿一覧を表示する予定です %>
-      </div>
-    </div>
    </main>
-
+<%= render partial: "prototype", collection: @prototypes %>
 <footer class="footer">
   <p class="copyright">Copyright PROTO SPACE All rights reserved</p>
 </footer>
