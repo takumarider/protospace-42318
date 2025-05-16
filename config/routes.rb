@@ -1,9 +1,14 @@
 Rails.application.routes.draw do
   devise_for :users
   root 'prototypes#index'
-  resources :users, only: [:index, :new, :create, :destroy, :edit]
-  resources :prototypes
+  
+  resources :users, only: [:index, :new, :create, :destroy, :edit, :show]
+  
+  resources :prototypes do 
+    resources :comments, only: :create
+  end
 end
+  
 
 #resources の役割
 #resources は RESTfulなURL（ルーティング）と、
