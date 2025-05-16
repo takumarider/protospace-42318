@@ -1,7 +1,7 @@
 <div class="card">
     <% if prototype.image.attached?%>
       <%= link_to prototype_path(prototype)do %>
-      <%= image_tag prototype.image.variant(resize: '500x500'), class: "card__img"%> 
+      <%= image_tag prototype.image, class: "card__img"%> 
       <% end %>
     <% end %>
 

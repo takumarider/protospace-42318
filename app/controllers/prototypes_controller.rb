@@ -20,7 +20,6 @@ before_action :configure_permitted_parameters, if: :devise_controller?
       @prototype = Prototype.find(params[:id])
       @comment = Comment.new #これだと @comment には「コメントの一覧（Relation）」が入ってしまいます。→ form_with では「空の1件のモデル」が欲しいので、Comment.new に直す必要があります。
       @comments = @prototype.comments.includes(:user)
-
   end
 
   def update
@@ -29,20 +28,18 @@ before_action :configure_permitted_parameters, if: :devise_controller?
     else
       render :edit, status: :unprocessable_entity
     end
- 
   end
+
   def new
     @prototype = Prototype.new
     # 新規作成ページの処理（ログインユーザーのみ）
   end
 
   def create
-    comment = Comment.create(comment_params)
-    redirect_to "/prototypes/#{comment.tweet.id}"  # コメントと結びつくツイートの詳細画面に遷移する
-
     @prototype = Prototype.new(prototype_params)
+    @prototype.user = current_user
     if @prototype.save
-      redirect_to root_path
+      redirect_to root_path, notice: 'プロトタイプが作成されました'
     else
       render :new, status: :unprocessable_entity
     end
@@ -59,7 +56,6 @@ before_action :configure_permitted_parameters, if: :devise_controller?
     devise_parameter_sanitizer.permit(:account_update, keys: [:name , :profile, :occupation, :position])
   end
 
-
   def set_prototype
     @prototype = Prototype.find(params[:id])
   end
@@ -69,8 +65,8 @@ before_action :configure_permitted_parameters, if: :devise_controller?
   end
 
    def move_to_index
-   unless current_user == @prototype.user
-     redirect_to root_path
-   end 
- end
+    unless current_user == @prototype.user
+       redirect_to root_path
+    end 
+  end
 end
