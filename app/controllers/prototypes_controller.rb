@@ -1,25 +1,31 @@
 class PrototypesController < ApplicationController
-before_action :set_prototype, only: [:show, :edit, :update, :destroy]
-before_action :move_to_index, only: [:edit, :update,]
-before_action :authenticate_user!
-before_action :configure_permitted_parameters, if: :devise_controller?
-
+  before_action :set_prototype, except: [:index, :new, :create]
+  before_action :authenticate_user!, except: [:index, :show]
+  before_action :contributor_confirmation, only: [:edit, :update, :destroy]
 
   def index
-    @users = User.all
-    @prototypes = Prototype.all
+    @prototypes = Prototype.includes(:user)
   end
-  
-  def destroy
-    prototype = Prototype.find(params[:id])
-    prototype.destroy
-    redirect_to root_path
+
+  def new
+    @prototype = Prototype.new
+  end
+
+  def create
+    @prototype = Prototype.new(prototype_params)
+    if @prototype.save
+      redirect_to root_path
+    else
+      render :new, status: :unprocessable_entity
+    end
   end
 
   def show
-      @prototype = Prototype.find(params[:id])
-      @comment = Comment.new #これだと @comment には「コメントの一覧（Relation）」が入ってしまいます。→ form_with では「空の1件のモデル」が欲しいので、Comment.new に直す必要があります。
-      @comments = @prototype.comments.includes(:user)
+    @comment = Comment.new
+    @comments = @prototype.comments
+  end
+
+  def edit
   end
 
   def update
@@ -30,43 +36,25 @@ before_action :configure_permitted_parameters, if: :devise_controller?
     end
   end
 
-  def new
-    @prototype = Prototype.new
-    # 新規作成ページの処理（ログインユーザーのみ）
-  end
-
-  def create
-    @prototype = Prototype.new(prototype_params)
-    @prototype.user = current_user
-    if @prototype.save
-      redirect_to root_path, notice: 'プロトタイプが作成されました'
+  def destroy
+    if @prototype.destroy
+      redirect_to root_path
     else
-      render :new, status: :unprocessable_entity
+      redirect_to root_path
     end
   end
-    
-  def edit
-    @prototype = Prototype.find(params[:id])
-  end
-
 
   private
-  def configure_permitted_parameters
-    devise_parameter_sanitizer.permit(:sign_up, keys: [:name , :profile, :occupation, :position])
-    devise_parameter_sanitizer.permit(:account_update, keys: [:name , :profile, :occupation, :position])
+
+  def prototype_params
+    params.require(:prototype).permit(:title, :catch_copy, :concept, :image).merge(user_id: current_user.id)
   end
 
   def set_prototype
     @prototype = Prototype.find(params[:id])
   end
 
-  def prototype_params
-    params.require(:prototype).permit(:title, :catch_copy, :concept, :image).merge(user_id: current_user.id)
-  end
-
-   def move_to_index
-    unless current_user == @prototype.user
-       redirect_to root_path
-    end 
+  def contributor_confirmation
+    redirect_to root_path unless current_user == @prototype.user
   end
 end
